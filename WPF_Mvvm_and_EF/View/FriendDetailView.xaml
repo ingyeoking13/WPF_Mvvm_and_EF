@@ -14,12 +14,17 @@
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="3*"></RowDefinition>
         </Grid.RowDefinitions>
         <Label Content="First Name"/>
-        <TextBox Grid.Row="1" Text="{Binding Friend.FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        <TextBox Grid.Row="1" Text="{Binding friend.FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
         <Label Grid.Row="2" Content="Last Name"/>
-        <TextBox Grid.Row="3" Text="{Binding Friend.LastName,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        <TextBox Grid.Row="3" Text="{Binding friend.LastName,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
         <Label Grid.Row="4" Content="Email"/>
-        <TextBox Grid.Row="5" Text="{Binding Friend.Email,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        <TextBox Grid.Row="5" Text="{Binding friend.Email,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        <StackPanel Grid.Row="6" Orientation="Horizontal">
+            <Button Content="Save" Command="{Binding SaveCommand}"/>
+        </StackPanel>
     </Grid>
 </UserControl>

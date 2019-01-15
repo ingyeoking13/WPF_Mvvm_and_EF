@@ -72,6 +72,7 @@
     </ApplicationDefinition>
     <Compile Include="Data\IFriendLookupDataService.cs" />
     <Compile Include="Data\LookupDataService.cs" />
+    <Compile Include="Events\AfterFriendSaveEvent.cs" />
     <Compile Include="Events\OpenFriendDetailViewEvent.cs" />
     <Compile Include="Helper\ViewModelBase.cs" />
     <Compile Include="Startup\Bootstrapper.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="viewModel\IFriendDetailViewModel.cs" />
     <Compile Include="viewModel\INavigationViewModel.cs" />
     <Compile Include="viewModel\MainViewModel.cs" />
+    <Compile Include="viewModel\NavigationItemViewModel.cs" />
     <Compile Include="viewModel\NavigationViewModel.cs" />
     <Compile Include="View\FriendDetailView.xaml.cs">
       <DependentUpon>FriendDetailView.xaml</DependentUpon>

@@ -7,5 +7,6 @@ namespace WPF_Mvvm_and_EF.Data
     public interface IFriendDataService
     {
         Task<Friend> GetByIdAsync(int friendId);
+        Task SaveAsync(Friend friend);
     }
 }
