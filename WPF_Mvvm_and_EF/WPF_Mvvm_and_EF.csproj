@@ -74,6 +74,7 @@
     <Compile Include="Data\LookupDataService.cs" />
     <Compile Include="Events\AfterFriendSaveEvent.cs" />
     <Compile Include="Events\OpenFriendDetailViewEvent.cs" />
+    <Compile Include="Helper\NotifyDataErrorBase.cs" />
     <Compile Include="Helper\ViewModelBase.cs" />
     <Compile Include="Startup\Bootstrapper.cs" />
     <Compile Include="viewModel\FriendDetailViewModel.cs" />
@@ -88,6 +89,8 @@
     <Compile Include="View\NavigationView.xaml.cs">
       <DependentUpon>NavigationView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Wrapper\FriendWrapper.cs" />
+    <Compile Include="Wrapper\ModelWrapper.cs" />
     <Page Include="View\FriendDetailView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
