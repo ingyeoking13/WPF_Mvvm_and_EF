@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using WPF_Mvvm_and_EF.DataAccess;
 using WPF_Mvvm_and_EF.Model;
 
-namespace WPF_Mvvm_and_EF.Data
+namespace WPF_Mvvm_and_EF.Data.LookUps
 {
     public class LookupDataService : IFriendLookupDataService
     {

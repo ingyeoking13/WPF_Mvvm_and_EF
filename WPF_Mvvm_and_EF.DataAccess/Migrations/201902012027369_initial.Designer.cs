@@ -7,13 +7,13 @@ namespace WPF_Mvvm_and_EF.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class InitialDatabase : IMigrationMetadata
+    public sealed partial class initial : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(InitialDatabase));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(initial));
         
         string IMigrationMetadata.Id
         {
-            get { return "201901121947109_InitialDatabase"; }
+            get { return "201902012027369_initial"; }
         }
         
         string IMigrationMetadata.Source

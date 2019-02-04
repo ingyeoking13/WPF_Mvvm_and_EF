@@ -25,6 +25,8 @@
         <TextBox Grid.Row="5" Text="{Binding friend.Email,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
         <StackPanel Grid.Row="6" Orientation="Horizontal">
             <Button Content="Save" Command="{Binding SaveCommand}"/>
+            <Button Content="Delete" Command="{Binding DeleteCommand}"/>
+
         </StackPanel>
     </Grid>
 </UserControl>

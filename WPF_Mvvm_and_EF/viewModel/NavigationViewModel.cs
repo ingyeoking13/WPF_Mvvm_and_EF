@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using WPF_Mvvm_and_EF.Data;
+using WPF_Mvvm_and_EF.Data.LookUps;
 using WPF_Mvvm_and_EF.Events;
 using WPF_Mvvm_and_EF.Helper;
 using WPF_Mvvm_and_EF.Model;
@@ -14,22 +15,6 @@ namespace WPF_Mvvm_and_EF.viewModel
     {
         private IFriendLookupDataService _svc;
         private IEventAggregator eventAggregator;
-
-        private NavigationItemViewModel _selectedFriend;
-        public NavigationItemViewModel selectedFriend
-        {
-            get { return _selectedFriend; }
-            set {
-                _selectedFriend = value;
-                OnPropertyChanged();
-
-                if ( _selectedFriend != null)
-                {
-                    eventAggregator.GetEvent<OpenFriendDetailViewEvent>().
-                        Publish(_selectedFriend.Id);
-                }
-            }
-        }
 
         public ObservableCollection<NavigationItemViewModel> Friends { get; }
 
@@ -45,9 +30,12 @@ namespace WPF_Mvvm_and_EF.viewModel
 
         private void AfterFriendSaved(AfterFriendSaveEventArgs obj)
         {
-            var item = Friends.Single(l => l.Id == obj.Id);
-            item.DisplayMember = obj.DisplayMember;
-            OnPropertyChanged();
+            var item = Friends.SingleOrDefault(l => l.Id == obj.Id);
+            if ( item == null)
+            {
+                Friends.Add(new NavigationItemViewModel(obj.Id, obj.DisplayMember, eventAggregator));
+            }
+            else item.DisplayMember = obj.DisplayMember;
         }
 
         public async Task LoadAsync()
@@ -56,7 +44,7 @@ namespace WPF_Mvvm_and_EF.viewModel
             Friends.Clear();
             foreach (var i in lookup)
             {
-                Friends.Add(new NavigationItemViewModel(i.Id, i.DisplayMember));
+                Friends.Add(new NavigationItemViewModel(i.Id, i.DisplayMember, eventAggregator));
             }
         }
     }

@@ -27,9 +27,7 @@ namespace WPF_Mvvm_and_EF.Wrapper
             ValidatePropertyInternal(propertyName, value);
         }
 
-
-        protected void ValidatePropertyInternal(string propertyName, 
-            object currentValue)
+        protected void ValidatePropertyInternal(string propertyName, object currentValue)
         {
             ClearErrors(propertyName);
             ValidateDataAnnotation(propertyName, currentValue);

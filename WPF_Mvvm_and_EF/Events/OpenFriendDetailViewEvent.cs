@@ -2,7 +2,7 @@
 
 namespace WPF_Mvvm_and_EF.Events
 {
-    public class OpenFriendDetailViewEvent:PubSubEvent<int>
+    public class OpenFriendDetailViewEvent:PubSubEvent<int?>
     {
     }
 }

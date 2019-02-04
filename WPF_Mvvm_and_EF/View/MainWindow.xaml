@@ -12,11 +12,21 @@
         >
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+            
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <view:NavigationView DataContext="{Binding navigationViewModel}"/>
-        <view:FriendDetailView Grid.Column="1" DataContext="{Binding friendDetailViewModel}"/>
+        <Menu Grid.ColumnSpan="2" FontSize="20">
+            <MenuItem Header="Create">
+                <MenuItem Header="New Friend" Command="{Binding CreateNewFreindCommand}"></MenuItem>
+            </MenuItem>
+        </Menu>
+        <view:NavigationView Grid.Row= "1" DataContext="{Binding navigationViewModel}"/>
+        <view:FriendDetailView Grid.Row="1" Grid.Column="1" DataContext="{Binding friendDetailViewModel}"/>
     </Grid>
 </Window>

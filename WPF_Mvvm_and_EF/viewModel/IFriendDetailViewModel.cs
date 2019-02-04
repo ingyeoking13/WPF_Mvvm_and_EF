@@ -4,6 +4,8 @@ namespace WPF_Mvvm_and_EF.viewModel
 {
     public interface IFriendDetailViewModel
     {
-        Task LoadAsync(int friendId);
+        Task LoadAsync(int? friendId);
+        bool hasChanges { get; }
+
     }
 }
