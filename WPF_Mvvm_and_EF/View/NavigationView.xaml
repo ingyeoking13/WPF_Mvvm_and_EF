@@ -19,7 +19,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:NavigationItemViewModel}">
                         <Button Content="{Binding DisplayMember}"
-                                Command="{Binding OpenFriendDetailViewCommand}">
+                                Command="{Binding OpenDetailViewCommand}">
 
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">

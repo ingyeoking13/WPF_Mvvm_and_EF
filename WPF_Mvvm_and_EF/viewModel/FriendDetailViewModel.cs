@@ -1,39 +1,44 @@
 ﻿using Prism.Commands;
 using Prism.Events;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using WPF_Mvvm_and_EF.Data.LookUps;
 using WPF_Mvvm_and_EF.Data.Repositories;
 using WPF_Mvvm_and_EF.Events;
 using WPF_Mvvm_and_EF.Helper;
 using WPF_Mvvm_and_EF.Model;
+using WPF_Mvvm_and_EF.Services;
 using WPF_Mvvm_and_EF.Wrapper;
 
 namespace WPF_Mvvm_and_EF.viewModel
 {
-    public class FriendDetailViewModel : ViewModelBase, IFriendDetailViewModel
+
+    public class FriendDetailViewModel : DetailViewModelBase, IFriendDetailViewModel
     {
         private IFriendRepository friendRepository;
-        private IEventAggregator eventAggregator;
+        private readonly IMessageDialogService messageDialogService;
+        private readonly IProgramminLanguageLookupDataService programminLanguageLookupDataService;
         private FriendWrapper _friend;
-        private bool _hasChanges;
+        private FriendPhoneNumberWrapper _SelectedPhoneNumber;
 
-        public bool hasChanges
+        public FriendPhoneNumberWrapper SelectedPhoneNumber
         {
-            get { return _hasChanges; }
+            get { return _SelectedPhoneNumber; }
             set {
-                if(_hasChanges != value)
-                {
-
-                    _hasChanges = value;
-                    OnPropertyChanged();
-                    ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
-                }
+                _SelectedPhoneNumber = value;
+                OnPropertyChanged();
+                ((DelegateCommand)RemovePhoneNumberCommand).RaiseCanExecuteChanged();
             }
         }
-
-        public ICommand SaveCommand { get; }
-        public ICommand DeleteCommand { get; }
+        public ICommand AddPhoneNumberCommand { get; }
+        public ICommand RemovePhoneNumberCommand { get; }
+        public ObservableCollection<LookupItem> ProgrammingLanguages { get; }
+        public ObservableCollection<FriendPhoneNumberWrapper> PhoneNumbers { get; }
 
         public FriendWrapper friend
         {
@@ -46,33 +51,102 @@ namespace WPF_Mvvm_and_EF.viewModel
         }
 
         public FriendDetailViewModel(
-            IFriendRepository dataService, IEventAggregator eventAggregator
-            )
+            IFriendRepository dataService, IEventAggregator eventAggregator,
+            IMessageDialogService messageDialogService ,
+            IProgramminLanguageLookupDataService programminLanguageLookupDataService
+            ):base(eventAggregator)
         {
             this.friendRepository = dataService;
-            this.eventAggregator = eventAggregator;
+            this.messageDialogService = messageDialogService;
+            this.programminLanguageLookupDataService = programminLanguageLookupDataService;
 
-            SaveCommand = new DelegateCommand(OnSaveExecute, OnSaveCanExecute);
-            DeleteCommand = new DelegateCommand(OnDeleteExecute);
+            AddPhoneNumberCommand = new DelegateCommand(OnAddPhoneNumberExectue);
+            RemovePhoneNumberCommand = new DelegateCommand(OnRemovePhoneNumberExecute, OnRemovePhoneNumberCanExecute); 
+            ProgrammingLanguages = new ObservableCollection<LookupItem>();
+            PhoneNumbers = new ObservableCollection<FriendPhoneNumberWrapper>();
         }
 
-        private async void OnDeleteExecute()
+        private bool OnRemovePhoneNumberCanExecute()
         {
+            return SelectedPhoneNumber != null;
+        }
+
+        private void OnRemovePhoneNumberExecute()
+        {
+            SelectedPhoneNumber.PropertyChanged -= FriendPhoneNumberWrapper_PropertyChanged;
+            friendRepository.RemovePhoneNumber(SelectedPhoneNumber.Model);
+            PhoneNumbers.Remove(SelectedPhoneNumber);
+            SelectedPhoneNumber = null;
+            hasChanges = friendRepository.HasChanges();
+            ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
+        }
+
+        private void OnAddPhoneNumberExectue()
+        {
+            var newNumber = new FriendPhoneNumberWrapper(new FriendPhoneNumber());
+            newNumber.PropertyChanged += FriendPhoneNumberWrapper_PropertyChanged;
+            PhoneNumbers.Add(newNumber);
+            _friend.Model.PhoneNumbers.Add(newNumber.Model);
+            newNumber.Number = "";
+        }
+
+        protected override async void OnDeleteExecute()
+        {
+            var result = messageDialogService.ShowOkCancelDialog($"Really Want to Delete? {friend.FirstName} {friend.LastName}?", "Question");
+            if (result == MessageDialogResult.Cancel) return;
             friendRepository.Delete(friend.Model);
             await friendRepository.SaveAsync();
+            RaiseDetailDeleteEvent(friend.Id);
         }
 
-        public async Task LoadAsync(int? friendId)
+        public override async Task LoadAsync(int? friendId)
         {
-            var friend_ = friendId.HasValue? 
-                await friendRepository.GetByIdAsync(friendId):CreateNewFriend();
+            var friend_ = friendId.HasValue ?
+                await friendRepository.GetByIdAsync(friendId) : CreateNewFriend();
+            InitializeFriend(friend_);
+
+            InitializeFriendPhoneNumber(friend_.PhoneNumbers);
+
+            await LoadProgrammingLanguageLoadAsync();
+        }
+
+        private void InitializeFriendPhoneNumber(ICollection<FriendPhoneNumber> phoneNumbers)
+        {
+            foreach (var wrapper in PhoneNumbers)
+            {
+                wrapper.PropertyChanged -= FriendPhoneNumberWrapper_PropertyChanged;
+            }
+            PhoneNumbers.Clear();
+
+            foreach (var friendPhoneNumber in phoneNumbers)
+            {
+                var wrapper = new FriendPhoneNumberWrapper(friendPhoneNumber);
+                PhoneNumbers.Add(wrapper);
+                wrapper.PropertyChanged += FriendPhoneNumberWrapper_PropertyChanged;
+            }
+        }
+
+        private void FriendPhoneNumberWrapper_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (!hasChanges)
+            {
+                hasChanges = friendRepository.HasChanges();
+            }
+            if ( e.PropertyName == nameof(FriendPhoneNumberWrapper.HasErrors))
+            {
+                ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
+            }
+        }
+
+        private void InitializeFriend(Friend friend_)
+        {
             friend = new FriendWrapper(friend_);
 
             friend.PropertyChanged += (s, e) =>
             {
 
                 if (!hasChanges) hasChanges = friendRepository.HasChanges();
-                if(e.PropertyName == nameof(friend.HasErrors))
+                if (e.PropertyName == nameof(friend.HasErrors))
                 {
                     ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
                 }
@@ -83,21 +157,27 @@ namespace WPF_Mvvm_and_EF.viewModel
             if (friend.Id == 0) friend.FirstName = "";
         }
 
-        private async void OnSaveExecute()
+        private async Task LoadProgrammingLanguageLoadAsync()
+        {
+            ProgrammingLanguages.Clear();
+            ProgrammingLanguages.Add(new NullLookupItem { DisplayMember = "NONE" });
+            var lookup = await programminLanguageLookupDataService.GetProgrammingLanguageLookupAsync();
+            foreach (var lookupItem in lookup)
+            {
+                ProgrammingLanguages.Add(lookupItem);
+            }
+        }
+
+        protected override async void OnSaveExecute()
         {
             await friendRepository.SaveAsync();
             hasChanges = friendRepository.HasChanges();
-            eventAggregator.GetEvent<AfterFriendSaveEvent>().Publish(
-                new AfterFriendSaveEventArgs
-                {
-                    Id = friend.Id,
-                    DisplayMember=$"{friend.FirstName} {friend.LastName}"
-                } );
+            RaiseDetailSaveEvent(friend.Id, $"{friend.FirstName} {friend.LastName}");
         }
 
-        private bool OnSaveCanExecute()
+        protected override bool OnSaveCanExecute()
         {
-            return friend != null && !friend.HasErrors && hasChanges;
+            return friend != null && PhoneNumbers.All(pn=>!pn.HasErrors) && !friend.HasErrors && hasChanges;
         }
 
         private Friend CreateNewFriend()

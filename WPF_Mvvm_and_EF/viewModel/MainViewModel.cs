@@ -16,18 +16,17 @@ namespace WPF_Mvvm_and_EF.viewModel
         private readonly Func<IFriendDetailViewModel> _friendDetailViewModelCreator;
 
         public INavigationViewModel navigationViewModel { get; }
-        public ICommand CreateNewFreindCommand { get; }
-        private IFriendDetailViewModel _friendDetailViewModel;
+        public ICommand CreateNewDetailCommand { get; }
 
-        public IFriendDetailViewModel friendDetailViewModel
+        private IDetailViewModel _detailViewModel;
+        public IDetailViewModel DetailViewModel
         {
-            get { return _friendDetailViewModel; }
+            get { return _detailViewModel; }
             private set {
-                _friendDetailViewModel = value;
+                _detailViewModel = value;
                 OnPropertyChanged();
             }
         }
-
 
         public MainViewModel(INavigationViewModel navigationViewModel,
             Func<IFriendDetailViewModel> friendDetailViewModelCreator,
@@ -41,17 +40,21 @@ namespace WPF_Mvvm_and_EF.viewModel
             _friendDetailViewModelCreator = friendDetailViewModelCreator;
 
             this.eventAggregator.
-                GetEvent<OpenFriendDetailViewEvent>().
-                Subscribe(OnOpenFriendDetailView);
+                GetEvent<OpenDetailViewEvent>().
+                Subscribe(OnOpenDetailView);
+            eventAggregator.GetEvent<AfterDetailDeleteEvent>().Subscribe(AfterDetailDeleted);
 
-            this.CreateNewFreindCommand = new DelegateCommand(OnCreateNewFriend);
+            this.CreateNewDetailCommand = new DelegateCommand<Type>(OnCreateNewDetail);
             this.navigationViewModel = navigationViewModel;
         }
 
-        private void OnCreateNewFriend()
+        private void OnCreateNewDetail(Type viewModelType)
         {
-            OnOpenFriendDetailView(null);
-//            throw new NotImplementedException();
+            OnOpenDetailView(new OpenDetailViewEventArgs
+            {
+                ViewModelName = viewModelType.Name
+            });
+
         }
 
         public async Task LoadAsync()
@@ -59,15 +62,27 @@ namespace WPF_Mvvm_and_EF.viewModel
             await navigationViewModel.LoadAsync();
         }
 
-        private async void OnOpenFriendDetailView(int? friendId)
+        private async void OnOpenDetailView(OpenDetailViewEventArgs args)
         {
-            if ( friendDetailViewModel!=null && friendDetailViewModel.hasChanges)
+            if ( DetailViewModel!=null && DetailViewModel.hasChanges)
             {
                 var ret = messageDialogService.ShowOkCancelDialog("You've made changes", "Are you OK?");
                 if (ret == MessageDialogResult.Cancel) return;
             }
-            friendDetailViewModel =  _friendDetailViewModelCreator();
-            await friendDetailViewModel.LoadAsync(friendId);
+
+            switch (args.ViewModelName)
+            {
+                case nameof(FriendDetailViewModel):
+                    DetailViewModel =  _friendDetailViewModelCreator();
+                    break;
+            }
+
+            await DetailViewModel.LoadAsync(args.Id);
+        }
+
+        private void AfterDetailDeleted(AfterDetailDeleteEventArgs args)
+        {
+            DetailViewModel = null;
         }
     }
 }

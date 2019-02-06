@@ -25,17 +25,39 @@ namespace WPF_Mvvm_and_EF.viewModel
             _svc = svc;
             this.eventAggregator = eventAggregator;
             Friends = new ObservableCollection<NavigationItemViewModel>();
-            eventAggregator.GetEvent<AfterFriendSaveEvent>().Subscribe(AfterFriendSaved); ;
+            eventAggregator.GetEvent<AfterDetailSavedEvent>().Subscribe(AfterDetailSaved); ;
+            eventAggregator.GetEvent<AfterDetailDeleteEvent>().Subscribe(AfterDetailDeleted); ;
         }
 
-        private void AfterFriendSaved(AfterFriendSaveEventArgs obj)
+        private void AfterDetailSaved(AfterDetailSavedEventArgs obj)
         {
-            var item = Friends.SingleOrDefault(l => l.Id == obj.Id);
-            if ( item == null)
+            switch (obj.ViewModelName)
             {
-                Friends.Add(new NavigationItemViewModel(obj.Id, obj.DisplayMember, eventAggregator));
+                case nameof(FriendDetailViewModel):
+                    var item = Friends.SingleOrDefault(l => l.Id == obj.Id);
+                    if (item == null)
+                    {
+                        Friends.Add(new NavigationItemViewModel(obj.Id, obj.DisplayMember,
+                            nameof(FriendDetailViewModel),
+                            eventAggregator));
+                    }
+                    else item.DisplayMember = obj.DisplayMember;
+                    break;
             }
-            else item.DisplayMember = obj.DisplayMember;
+        }
+
+        private void AfterDetailDeleted(AfterDetailDeleteEventArgs args)
+        {
+            switch (args.ViewModelName)
+            {
+                case nameof(FriendDetailViewModel):
+                    var friend = Friends.SingleOrDefault(n => n.Id == args.Id);
+                    if ( friend != null)
+                    {
+                        Friends.Remove(friend);
+                    }
+                    break;
+            }
         }
 
         public async Task LoadAsync()
@@ -44,7 +66,9 @@ namespace WPF_Mvvm_and_EF.viewModel
             Friends.Clear();
             foreach (var i in lookup)
             {
-                Friends.Add(new NavigationItemViewModel(i.Id, i.DisplayMember, eventAggregator));
+                Friends.Add(new NavigationItemViewModel(i.Id, i.DisplayMember, 
+                    nameof(FriendDetailViewModel),
+                    eventAggregator));
             }
         }
     }

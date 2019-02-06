@@ -71,17 +71,22 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Data\LookUps\IFriendLookupDataService.cs" />
+    <Compile Include="Data\LookUps\IProgramminLanguageLookupDataService.cs" />
     <Compile Include="Data\LookUps\LookupDataService.cs" />
     <Compile Include="Data\Repositories\FriendRepository.cs" />
+    <Compile Include="Data\Repositories\GenericRepository.cs" />
     <Compile Include="Data\Repositories\IFriendRepository.cs" />
-    <Compile Include="Events\AfterFriendSaveEvent.cs" />
-    <Compile Include="Events\OpenFriendDetailViewEvent.cs" />
+    <Compile Include="Events\AfterDetailDeleteEvent.cs" />
+    <Compile Include="Events\AfterDetailSavedEvent.cs" />
+    <Compile Include="Events\OpenDetailViewEvent.cs" />
     <Compile Include="Helper\NotifyDataErrorBase.cs" />
     <Compile Include="Helper\ViewModelBase.cs" />
     <Compile Include="Services\IMessageDialogService.cs" />
     <Compile Include="Services\MessageDialogService.cs" />
     <Compile Include="Startup\Bootstrapper.cs" />
+    <Compile Include="viewModel\DetailViewModel.cs" />
     <Compile Include="viewModel\FriendDetailViewModel.cs" />
+    <Compile Include="viewModel\IDetailViewModel.cs" />
     <Compile Include="viewModel\IFriendDetailViewModel.cs" />
     <Compile Include="viewModel\INavigationViewModel.cs" />
     <Compile Include="viewModel\MainViewModel.cs" />
@@ -93,6 +98,7 @@
     <Compile Include="View\NavigationView.xaml.cs">
       <DependentUpon>NavigationView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Wrapper\FriendPhoneNumberWrapper.cs" />
     <Compile Include="Wrapper\FriendWrapper.cs" />
     <Compile Include="Wrapper\ModelWrapper.cs" />
     <Page Include="View\FriendDetailView.xaml">

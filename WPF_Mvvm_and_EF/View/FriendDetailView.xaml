@@ -8,14 +8,16 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="3*"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition/>
+            <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Label Content="First Name"/>
         <TextBox Grid.Row="1" Text="{Binding friend.FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
@@ -23,10 +25,43 @@
         <TextBox Grid.Row="3" Text="{Binding friend.LastName,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
         <Label Grid.Row="4" Content="Email"/>
         <TextBox Grid.Row="5" Text="{Binding friend.Email,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-        <StackPanel Grid.Row="6" Orientation="Horizontal">
+
+        <Label Grid.Row="6" Content="Favorite Language" Margin="10 0"/>
+        <ComboBox Grid.Row="7" ItemsSource="{Binding ProgrammingLanguages}" 
+                  Margin="10, 0, 10, 10"
+                  SelectedValuePath="Id"
+                  SelectedValue="{Binding friend.FavoriteLanguageId, Mode=TwoWay}"
+                  >
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding DisplayMember}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <DockPanel Grid.Row="8" Margin="10">
+            <StackPanel DockPanel.Dock="Right">
+                <Button Content="Add" Width="125" Margin="10"
+                        Command="{Binding AddPhoneNumberCommand}"/>
+                <Button Content="Remove" Width="125" Margin="10"
+                        Command="{Binding RemovePhoneNumberCommand}"/>
+            </StackPanel>
+            <DataGrid ItemsSource="{Binding PhoneNumbers}"
+                      SelectedItem="{Binding SelectedPhoneNumber, Mode=TwoWay}"
+                      AutoGenerateColumns="False" RowHeaderWidth="0">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Phone Numbers" Width="*"
+                    ElementStyle="{StaticResource DataGridColumnStyle}"
+                    EditingElementStyle="{StaticResource DataGridEditingColumnStyle}"
+                    Binding="{Binding Number, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+
+        <StackPanel Grid.Row="9" Orientation="Horizontal">
             <Button Content="Save" Command="{Binding SaveCommand}"/>
             <Button Content="Delete" Command="{Binding DeleteCommand}"/>
-
         </StackPanel>
+
     </Grid>
 </UserControl>

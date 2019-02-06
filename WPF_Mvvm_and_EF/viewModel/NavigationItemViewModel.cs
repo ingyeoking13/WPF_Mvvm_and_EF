@@ -13,18 +13,24 @@ namespace WPF_Mvvm_and_EF.viewModel
 {
     public class NavigationItemViewModel : ViewModelBase
     {
-        public NavigationItemViewModel(int id, string displayMember, IEventAggregator eventAggregator)
+        public NavigationItemViewModel(int id, 
+            string displayMember, 
+            string detailViewModelName,
+            IEventAggregator eventAggregator
+            )
         {
             Id = id;
             DisplayMember =  displayMember;
+            this.detailViewModelName = detailViewModelName;
             this.eventAggregator = eventAggregator;
-            OpenFriendDetailViewCommand = new DelegateCommand(OnOpenFriendDetailView);
+            OpenDetailViewCommand = new DelegateCommand(OnOpenDetailViewExecute);
 
         }
 
         public int Id { get; set; }
-        public ICommand OpenFriendDetailViewCommand { get; }
+        public ICommand OpenDetailViewCommand { get; }
         private string _displaymember;
+        private readonly string detailViewModelName;
         private readonly IEventAggregator eventAggregator;
 
         public string DisplayMember
@@ -36,9 +42,14 @@ namespace WPF_Mvvm_and_EF.viewModel
             }
         }
 
-        private void OnOpenFriendDetailView()
+        private void OnOpenDetailViewExecute()
         {
-            eventAggregator.GetEvent<OpenFriendDetailViewEvent>().Publish(Id);
+            eventAggregator.GetEvent<OpenDetailViewEvent>().Publish(
+                new OpenDetailViewEventArgs
+                {
+                    Id=Id,
+                    ViewModelName=detailViewModelName
+                });
         }
     }
 }

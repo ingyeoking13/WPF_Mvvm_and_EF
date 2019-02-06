@@ -24,6 +24,7 @@ namespace WPF_Mvvm_and_EF.Helper
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
             OnPropertyChanged(nameof(HasErrors));
         }
+   
 
         protected void AddError(string propertyName, string error)
         {

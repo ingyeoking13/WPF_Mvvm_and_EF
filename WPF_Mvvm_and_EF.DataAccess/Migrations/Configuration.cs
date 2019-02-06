@@ -18,6 +18,22 @@ namespace WPF_Mvvm_and_EF.DataAccess.Migrations
 
             //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
             //  to avoid creating duplicate seed data.
+
+            context.ProgrammingLanguages.AddOrUpdate(
+                pl => pl.Name,
+                new Model.ProgrammingLanguage { Name = "C#" },
+                new Model.ProgrammingLanguage { Name = "TypeScript" },
+                new Model.ProgrammingLanguage { Name = "F#" },
+                new Model.ProgrammingLanguage { Name = "Swift" },
+                new Model.ProgrammingLanguage { Name = "Java" }
+                );
+
+            context.SaveChanges();
+
+            context.FriendPhoneNumbers.AddOrUpdate(pn => pn.Number,
+                new Model.FriendPhoneNumber {
+                    Number = "+82 1012345678",
+                    FriendId = context.Friends.First().Id });
         }
     }
 }
