@@ -9,7 +9,10 @@ using WPF_Mvvm_and_EF.Model;
 
 namespace WPF_Mvvm_and_EF.Data.LookUps
 {
-    public class LookupDataService : IFriendLookupDataService, IProgramminLanguageLookupDataService
+    public class LookupDataService : 
+        IFriendLookupDataService, 
+        IProgramminLanguageLookupDataService, 
+        IMeetingLookupDataService
     {
         private Func<FriendOrganizerDbContext> _contextCreator;
 
@@ -43,6 +46,20 @@ namespace WPF_Mvvm_and_EF.Data.LookUps
                         DisplayMember = f.Name
                     }).ToListAsync();
             };
+        }
+
+        public async Task<List<LookupItem>> GetMeetingLookupAsync()
+        {
+            using (var ctx = _contextCreator())
+            {
+                var items = await ctx.Meetings.AsNoTracking().Select(
+                    m => new LookupItem
+                    {
+                        Id = m.Id,
+                        DisplayMember = m.Title
+                    }).ToListAsync();
+                return items;
+            }
         }
     }
 }

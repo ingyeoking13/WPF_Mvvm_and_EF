@@ -15,6 +15,7 @@ namespace WPF_Mvvm_and_EF
             DataContext = this.vm;
 
             Loaded += MainWindow_Loaded;
+
         }
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)

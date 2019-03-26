@@ -24,7 +24,6 @@ namespace WPF_Mvvm_and_EF.viewModel
             this.detailViewModelName = detailViewModelName;
             this.eventAggregator = eventAggregator;
             OpenDetailViewCommand = new DelegateCommand(OnOpenDetailViewExecute);
-
         }
 
         public int Id { get; set; }

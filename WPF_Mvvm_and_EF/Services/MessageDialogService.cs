@@ -16,6 +16,11 @@ namespace WPF_Mvvm_and_EF.Services
             return ret == MessageBoxResult.OK? 
                 MessageDialogResult.Ok:MessageDialogResult.Cancel;
         }
+
+        public void ShowInfoDialog(string text)
+        {
+            MessageBox.Show(text, "INFO");
+        }
     }
     public enum MessageDialogResult
     {

@@ -10,6 +10,10 @@ namespace WPF_Mvvm_and_EF.viewModel
     public abstract class DetailViewModelBase : ViewModelBase, IDetailViewModel
     {
         private bool _hasChanges;
+        private IEventAggreagator eventAggreagator;
+        private int? id;
+        private string _title;
+
         public bool hasChanges
         {
             get { return _hasChanges; }
@@ -28,11 +32,28 @@ namespace WPF_Mvvm_and_EF.viewModel
         public ICommand SaveCommand { get; private set; }
         public ICommand DeleteCommand { get; private set; }
 
+        public string Title
+        {
+            get { return _title; }
+            set { _title = value; }
+        }
+
+        public int? Id
+        {
+            get { return id; }
+            protected set { id = value; }
+        }
+
         public DetailViewModelBase(IEventAggregator eventAggregator)
         {
             this.eventAggregator = eventAggregator;
             SaveCommand = new DelegateCommand(OnSaveExecute, OnSaveCanExecute);
             DeleteCommand = new DelegateCommand(OnDeleteExecute);
+        }
+
+        protected DetailViewModelBase(IEventAggreagator eventAggreagator)
+        {
+            this.eventAggreagator = eventAggreagator;
         }
 
         protected abstract void OnDeleteExecute();

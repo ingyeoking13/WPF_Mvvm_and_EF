@@ -1,9 +1,11 @@
 namespace WPF_Mvvm_and_EF.DataAccess.Migrations
 {
     using System;
+    using System.Collections.Generic;
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Linq;
+    using WPF_Mvvm_and_EF.Model;
 
     internal sealed class Configuration : DbMigrationsConfiguration<WPF_Mvvm_and_EF.DataAccess.FriendOrganizerDbContext>
     {
@@ -34,6 +36,23 @@ namespace WPF_Mvvm_and_EF.DataAccess.Migrations
                 new Model.FriendPhoneNumber {
                     Number = "+82 1012345678",
                     FriendId = context.Friends.First().Id });
+
+            context.SaveChanges();
+
+            context.Meetings.AddOrUpdate(
+                m => m.Title,
+                new Model.Meeting
+                {
+                    Title = "Watching Soccer",
+                    DateFrom = new DateTime(2018, 5, 26),
+                    DateTo = new DateTime(2018, 5, 26),
+                    Friends = new List<Friend>
+                    {
+                        context.Friends.Single(f=>f.FirstName == "¡§" && f.LastName == "ø‰«—"),
+                        context.Friends.Single(f=>f.FirstName == "±Ë" && f.LastName=="πŒ»Ò")
+                    }
+                }
+                );
         }
     }
 }

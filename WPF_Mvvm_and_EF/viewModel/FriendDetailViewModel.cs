@@ -92,6 +92,12 @@ namespace WPF_Mvvm_and_EF.viewModel
 
         protected override async void OnDeleteExecute()
         {
+            if ( await friendRepository.HasMeetingsAsync(friend.Id))
+            {
+                messageDialogService.ShowInfoDialog($"{friend.FirstName} {friend.LastName} can't be deleted. This friend has a meeting.");
+                return;
+            }
+
             var result = messageDialogService.ShowOkCancelDialog($"Really Want to Delete? {friend.FirstName} {friend.LastName}?", "Question");
             if (result == MessageDialogResult.Cancel) return;
             friendRepository.Delete(friend.Model);
@@ -103,7 +109,9 @@ namespace WPF_Mvvm_and_EF.viewModel
         {
             var friend_ = friendId.HasValue ?
                 await friendRepository.GetByIdAsync(friendId) : CreateNewFriend();
+
             InitializeFriend(friend_);
+            Id = friend_.Id;
 
             InitializeFriendPhoneNumber(friend_.PhoneNumbers);
 
@@ -150,11 +158,19 @@ namespace WPF_Mvvm_and_EF.viewModel
                 {
                     ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
                 }
+                if (e.PropertyName == nameof(friend.FirstName) ||
+                e.PropertyName == nameof(friend.LastName)) SetTitle();
             };
 
             ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
 
             if (friend.Id == 0) friend.FirstName = "";
+            SetTitle();
+        }
+
+        private void SetTitle()
+        {
+            Title = $"{friend.FirstName} {friend.LastName}";
         }
 
         private async Task LoadProgrammingLanguageLoadAsync()
@@ -172,6 +188,8 @@ namespace WPF_Mvvm_and_EF.viewModel
         {
             await friendRepository.SaveAsync();
             hasChanges = friendRepository.HasChanges();
+
+            Id = friend.Id;
             RaiseDetailSaveEvent(friend.Id, $"{friend.FirstName} {friend.LastName}");
         }
 

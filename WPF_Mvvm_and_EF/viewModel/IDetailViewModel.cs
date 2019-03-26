@@ -6,5 +6,6 @@ namespace WPF_Mvvm_and_EF.viewModel
     {
         Task LoadAsync(int? friendId);
         bool hasChanges { get; }
+        int? Id { get; }
     }
 }
